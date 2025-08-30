@@ -31,6 +31,8 @@ function App() {
                 <span className="navbar-brand">HRM-Connect</span>
                 <div className="navbar-nav ms-auto">
                   <span className="navbar-text me-3">Welcome, {user.name}</span>
+                  
+                  
                   <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
                     Logout
                   </button>
@@ -40,18 +42,9 @@ function App() {
             
             <div className="container mt-4">
               <Routes>
-                <Route 
-                  path="/admin" 
-                  element={user.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} 
-                />
-                <Route 
-                  path="/manager" 
-                  element={user.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/" />} 
-                />
-                <Route 
-                  path="/employee" 
-                  element={user.role === 'employee' ? <EmployeeDashboard /> : <Navigate to="/" />} 
-                />
+                <Route path="/admin" element={user.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
+                <Route path="/manager" element={user.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/" />} />
+                <Route path="/employee" element={user.role === 'employee' ? <EmployeeDashboard /> : <Navigate to="/" />} />
                 <Route 
                   path="/" 
                   element={
