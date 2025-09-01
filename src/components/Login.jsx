@@ -7,10 +7,10 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Simple authentication logic
     if (username === 'admin' && password === 'admin123') {
-      onLogin('admin', { name: 'Admin User', role: 'admin' });
+      onLogin('admin', { name: 'Kelvin SuperAdmin', role: 'admin' });
     } else if (username === 'manager1' && password === 'manager123') {
       onLogin('manager', { name: 'Sarah Manager', role: 'manager' });
     } else if (username === 'employee1' && password === 'emp123') {
@@ -21,13 +21,13 @@ function Login({ onLogin }) {
   };
 
   return (
-    <Container fluid className="vh-100 d-flex align-items-center justify-content-center login-container">
+    <Container fluid className="login-container vh-100 d-flex align-items-center justify-content-center ">
       <Row className="w-100 justify-content-center">
         <Col md={6} lg={4}>
           <Card className="shadow">
             <Card.Body className="p-4">
               <h2 className="text-center mb-4 text-primary">HRM-Connect</h2>
-              <p className="text-center text-muted">Sign in to access your dashboard</p>
+              <p className="text-center text-muted ">Sign in to access your dashboard</p>
               
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
@@ -58,7 +58,7 @@ function Login({ onLogin }) {
               </Form>
 
               <div className="mt-4 p-3 bg-light rounded">
-                <h6 className="mb-2">Demo Accounts:</h6>
+                <h6 className='fw-bold text-warning'>demo credentials:</h6>
                 <p className="mb-1"><strong>Admin:</strong> admin / admin123</p>
                 <p className="mb-1"><strong>Manager:</strong> manager1 / manager123</p>
                 <p className="mb-0"><strong>Employee:</strong> employee1 / emp123</p>
