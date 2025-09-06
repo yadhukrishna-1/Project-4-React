@@ -8,15 +8,18 @@ function Login({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Simple authentication logic
-    if (username === 'admin' && password === 'admin123') {
-      onLogin('admin', { name: 'Kelvin SuperAdmin', role: 'admin' });
-    } else if (username === 'manager1' && password === 'manager123') {
-      onLogin('manager', { name: 'Sarah Manager', role: 'manager' });
-    } else if (username === 'employee1' && password === 'emp123') {
-      onLogin('employee', { name: 'Mike Developer', role: 'employee' });
+    console.log('Login attempt:', { username, password });
+
+    // Fetch employees from localStorage
+    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
+    const user = employees.find(emp => emp.username === username && emp.password === password);
+
+    if (user) {
+      console.log('Login successful for user:', user);
+      onLogin(user.role, user);
     } else {
-      alert('Invalid credentials. Use demo accounts: admin/admin123, manager1/manager123, employee1/emp123');
+      console.log('Login failed: Invalid username or password');
+      alert('Invalid credentials. Please check your username and password.');
     }
   };
 
@@ -59,7 +62,7 @@ function Login({ onLogin }) {
 
               <div className="mt-4 p-3 bg-light rounded">
                 <h6 className='fw-bold text-warning'>demo credentials:</h6>
-                <p className="mb-1"><strong>Admin:</strong> admin / admin123</p>
+                <p className="mb-1"><strong>Super Admin:</strong> superadmin / superadmin123</p>
                 <p className="mb-1"><strong>Manager:</strong> manager1 / manager123</p>
                 <p className="mb-0"><strong>Employee:</strong> employee1 / emp123</p>
               </div>

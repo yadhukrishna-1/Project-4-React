@@ -29,6 +29,8 @@ function EmployeeDashboard() {
     pending: 0
   };
 
+
+
   return (
     <div>
       <h2 className="mb-4">Employee Dashboard</h2>
@@ -100,7 +102,7 @@ function EmployeeDashboard() {
             </Card.Body>
           </Card>
           
-          <Card>
+          <Card className="mb-4">
             <Card.Header>
               <h5 className="mb-0">Task Summary</h5>
             </Card.Header>
@@ -133,8 +135,12 @@ function EmployeeDashboard() {
               </Row>
             </Card.Body>
           </Card>
+
+
         </Col>
       </Row>
+
+
     </div>
   );
 }
