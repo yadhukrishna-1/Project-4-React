@@ -88,6 +88,7 @@ function AdminDashboard() {
       localStorage.setItem('departments', JSON.stringify(deptData));
     }
 
+    
     // Load pending requests
     // const requests = getPendingRequests();
     // setPendingRequests(requests);
