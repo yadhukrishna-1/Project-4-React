@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, ListGroup, Badge, Tabs, Tab, Button, Modal, Form, Table, Alert } from 'react-bootstrap';
-import { getPendingRequests, updateRequestStatus } from '../utils/requests';
 
 // Constant demo users
 const DEMO_USERS = [
@@ -54,7 +53,6 @@ function AdminDashboard() {
   const [showAddDepartment, setShowAddDepartment] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ name: '', role: 'employee', department: '', email: '', username: '', password: '' });
   const [newDepartment, setNewDepartment] = useState({ name: '', description: '' });
-  const [pendingRequests, setPendingRequests] = useState([]);
 
   useEffect(() => {
     // localStorage.removeItem('employees');
@@ -87,8 +85,6 @@ function AdminDashboard() {
       setDepartments(deptData);
       localStorage.setItem('departments', JSON.stringify(deptData));
     }
-
-    
     // Load pending requests
     // const requests = getPendingRequests();
     // setPendingRequests(requests);
@@ -127,13 +123,6 @@ function AdminDashboard() {
     const updatedEmployees = employees.filter(e => e.id !== emp.id);
     setEmployees(updatedEmployees);
     saveToLocalStorage('employees', updatedEmployees);
-
-    // Update request status to processed
-    const req = pendingRequests.find(r => r.username === emp.email);
-    if (req) {
-      updateRequestStatus(req.id, 'processed');
-      setPendingRequests(pendingRequests.filter(r => r.id !== req.id));
-    }
   };
 
   return (
@@ -158,6 +147,12 @@ function AdminDashboard() {
               </Card>
             </Col>
             <Col md={3} className="mb-3">
+              <Card className="text-center h-100">
+                <Card.Body>
+                  <h3 className="text-primary">{managers}</h3>
+                  <p className="text-muted">Managers</p>
+                </Card.Body>
+              </Card>
             </Col>
             <Col md={3} className="mb-3">
               <Card className="text-center h-100">

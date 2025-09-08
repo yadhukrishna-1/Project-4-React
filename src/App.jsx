@@ -10,64 +10,6 @@ import './App.css';
 function App() {
   const [user, setUser] = useState(null);
 
-  // Initialize demo users and departments in localStorage on app start
-  // useEffect(() => {
-  //   const DEMO_USERS = [
-  //     {
-  //       id: 1,
-  //       name: 'Super Admin',
-  //       role: 'admin',
-  //       department: 'Administration',
-  //       email: 'superadmin@hrmconnect.com',
-  //       username: 'superadmin',
-  //       password: 'superadmin123'
-  //     }
-  //     ,
-  //     {
-  //       id: 2,
-  //       name: 'Manager One',
-  //       role: 'manager',
-  //       department: 'Administration',
-  //       email: 'manager1@hrmconnect.com',
-  //       username: 'manager1',
-  //       password: 'manager123'
-  //     },
-  //     {
-  //       id: 3,
-  //       name: 'Employee One',
-  //       role: 'employee',
-  //       department: 'Administration',
-  //       email: 'employee1@hrmconnect.com',
-  //       username: 'employee1',
-  //       password: 'emp123'
-  //     }
-  //   ];
-
-  //   const storedEmployees = localStorage.getItem('employees');
-  //   if (!storedEmployees) {
-  //     localStorage.setItem('employees', JSON.stringify(DEMO_USERS));
-  //   } else {
-  //     // Ensure demo users are present
-  //     let empData = JSON.parse(storedEmployees);
-  //     DEMO_USERS.forEach(demoUser => {
-  //       if (!empData.find(emp => emp.username === demoUser.username && emp.password === demoUser.password)) {
-  //         empData.push(demoUser);
-  //       }
-  //     });
-  //     localStorage.setItem('employees', JSON.stringify(empData));
-  //   }
-
-  //   const storedDepartments = localStorage.getItem('departments');
-  //   if (!storedDepartments) {
-  //     const defaultDept = {
-  //       id: 1,
-  //       name: 'Administration',
-  //       description: 'Administrative department'
-  //     };
-  //     localStorage.setItem('departments', JSON.stringify([defaultDept]));
-  //   }
-  // }, []);
-
   const handleLogin = (role, userData) => { setUser({ ...userData, role }); };
 
   const handleLogout = () => { setUser(null); };
