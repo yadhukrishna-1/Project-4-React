@@ -9,7 +9,6 @@ import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
-
   const handleLogin = (role, userData) => { setUser({ ...userData, role }); };
 
   const handleLogout = () => { setUser(null); };
