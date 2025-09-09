@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, Container, Row, Col } from 'react-bootstrap';
+import './Login.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -10,9 +11,10 @@ function Login({ onLogin }) {
 
     console.log('Login attempt:', { username, password });
 
-    // Fetch employees from localStorage
     const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-    const user = employees.find(emp => emp.username === username && emp.password === password);
+    const user = employees.find(
+      (emp) => emp.username === username && emp.password === password
+    );
 
     if (user) {
       console.log('Login successful for user:', user);
@@ -24,55 +26,79 @@ function Login({ onLogin }) {
   };
 
   return (
-    <Container fluid className="login-container vh-100 d-flex align-items-center justify-content-center ">
-      <Row className="w-100 justify-content-center">
-        <Col md={6} lg={4}>
-          <Card className="shadow">
-            <Card.Body className="p-4">
-              <h2 className="text-center mb-4 text-primary">HRM-Connect</h2>
-              <p className="text-center text-muted ">Sign in to access your dashboard</p>
-              
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Username</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                </Form.Group>
+    <div className="login-container">
+      <div className="login-box shadow-lg">
+        {/* Left side */}
+        <div className="login-left">
+          <img src="img-3.png" alt="HRM Logo" className="logo blue-icon" />
+          {/* D:\programs\PROJECTS\3rd-(React)\HRM-Connect\public\img-3.png           */}
+          <h2>HRM-CONNECT</h2>
+          <p>Streamlining HR operations with ease and efficiency.</p>
+        </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </Form.Group>
+        {/* Right side */}
+        <div className="login-right">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="form-control"
+              />
+            </div>
 
-                <Button variant="primary" type="submit" className="w-100 mb-3">
-                  Sign In
-                </Button>
-              </Form>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="form-control"
+              />
+            </div>
 
-              <div className="mt-4 p-3 bg-light rounded">
-                <h6 className='fw-bold text-warning'>demo credentials:</h6>
-                <p className="mb-1"><strong>Super Admin:</strong> superadmin / superadmin123</p>
-                <p className="mb-1"><strong>Manager:</strong> manager1 / manager123</p>
-                <p className="mb-0"><strong>Employee:</strong> employee1 / emp123</p>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <input type="checkbox" id="remember" />{' '}
+                <label htmlFor="remember" className="small">
+                  Remember me
+                </label>
               </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+              {/* <a href="#" className="small text-light">
+                Recover password
+              </a> */}
+            </div>
+
+            <button type="submit" className="btn btn-primary w-100 mb-3">
+              Sign In
+            </button>
+          </form>
+
+          <div className="mt-3 p-3 bg-light rounded text-dark">
+            <h6 className="fw-bold text-primary mb-2">Terms & Conditions</h6>
+            <ul className="small mb-0">
+              <li>Use this system responsibly and for authorized purposes only.</li>
+              <li>Keep your login credentials confidential and secure.</li>
+              <li>Comply with company policies regarding HR data and privacy.</li>
+              <li>Activity may be monitored for security purposes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
-
 
 export default Login;

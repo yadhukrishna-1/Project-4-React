@@ -1,0 +1,81 @@
+/* Full-screen container */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1e3a8a; /* Blue background */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Card box with split sides */
+.login-box {
+  display: flex;
+  width: 850px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Left side (branding) */
+.login-left {
+  flex: 1;
+  background: #ffffff;
+  color: #1e3a8a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.login-left .logo {
+  width: 70px;
+  margin-bottom: 20px;
+}
+
+.login-left h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.login-left p {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Right side (form) */
+.login-right {
+  flex: 1;
+  background: #1e3a8a;
+  color: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-right form .form-control {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.login-right a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+.login-right button {
+  background: #2563eb;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-right button:hover {
+  background: #1d4ed8;
+}
