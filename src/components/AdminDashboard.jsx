@@ -95,9 +95,6 @@ function AdminDashboard() {
       setDepartments(deptData);
       localStorage.setItem('departments', JSON.stringify(deptData));
     }
-    // Load pending requests
-    // const requests = getPendingRequests();
-    // setPendingRequests(requests);
   }, []);
 
 
@@ -227,7 +224,7 @@ function AdminDashboard() {
   return (
     <div>
       <div className="mb-4">
-        <ul className="nav nav-tabs" role="tablist">
+        <ul className="nav nav-tabs mb-3" role="tablist">
           <li className="nav-item" role="presentation">
             <button
               className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
@@ -438,7 +435,9 @@ function AdminDashboard() {
                   <td>{dept.name}</td>
                   <td>{dept.description}</td>
                   <td>
+                    {dept.name !== 'Administration' && (
                     <button className="btn btn-sm btn-warning me-2" onClick={() => openEditDepartment(dept)}>Edit</button>
+                    )}
                     {dept.name !== 'Administration' && (
                       <button className="btn btn-sm btn-danger" onClick={() => confirmDeleteDepartment(dept)}>Delete</button>
                     )}
