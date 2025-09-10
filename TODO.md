@@ -1,5 +1,6 @@
-# TODO for Login Page Bootstrap Styling
+# TODO List for Removing Administration Department Deletion Button
 
-- [x] Edit src/components/Login.jsx to replace custom classes with Bootstrap equivalents
-- [x] Edit src/components/Login.css to remove styles for replaced classes
-- [ ] Test the login page styling
+- [x] Modify departments table to conditionally render Delete button only for non-Administration departments
+- [x] Add safety check in handleDelete function to prevent deletion of Administration department
+- [ ] Verify changes: Delete button hidden for Administration, visible for others
+- [ ] Test deletion of other departments to ensure functionality intact
