@@ -214,12 +214,6 @@ function AdminDashboard() {
   const managers = employees.filter(emp => emp.role === 'manager').length;
   const admins = employees.filter(emp => emp.role === 'admin').length;
 
-  // const handleRemoveEmployee = (emp) => {
-  //   // Remove employee from employees list
-  //   const updatedEmployees = employees.filter(e => e.id !== emp.id);
-  //   setEmployees(updatedEmployees);
-  //   saveToLocalStorage('employees', updatedEmployees);
-  // };
 
   return (
     <div>
