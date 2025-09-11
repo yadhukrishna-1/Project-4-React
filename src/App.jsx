@@ -9,9 +9,12 @@ import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
-  const handleLogin = (role, userData) => { setUser({ ...userData, role }); };
+  const handleLogin = (userData) => { setUser(userData); };
 
-  const handleLogout = () => { setUser(null); };
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUser');
+    setUser(null);
+  };
 
   return (
     <Router>

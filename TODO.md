@@ -1,6 +1,8 @@
-# TODO List for Removing Administration Department Deletion Button
+# TODO: Refactor EmployeeDashboard to use plain divs
 
-- [x] Modify departments table to conditionally render Delete button only for non-Administration departments
-- [x] Add safety check in handleDelete function to prevent deletion of Administration department
-- [ ] Verify changes: Delete button hidden for Administration, visible for others
-- [ ] Test deletion of other departments to ensure functionality intact
+- [x] Replace Card components with divs and add CSS classes for styling
+- [x] Replace Row and Col with divs using flexbox layout
+- [x] Replace Badge components with divs with background colors
+- [x] Replace ListGroup with ul/li elements
+- [x] Add inline styles or CSS classes for layout and appearance
+- [ ] Test the refactored component for functionality and layout

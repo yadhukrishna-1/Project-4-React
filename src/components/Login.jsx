@@ -18,7 +18,9 @@ function Login({ onLogin }) {
 
     if (user) {
       console.log('Login successful for user:', user);
-      onLogin(user.role, user);
+      // Store logged-in user in localStorage for dashboard access
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      onLogin(user);
     } else {
       console.log('Login failed: Invalid username or password');
       alert('Invalid credentials. Please check your username and password.');

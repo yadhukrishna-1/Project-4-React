@@ -79,3 +79,33 @@
 .login-right button:hover {
   background: #1d4ed8;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .login-box {
+    flex-direction: column;
+    max-width: 568px;
+    width: 100%;
+    margin: 10px;
+  }
+
+  .login-left,
+  .login-right {
+    flex: none;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .login-left h2 {
+    font-size: 20px;
+  }
+
+  .login-left p {
+    font-size: 12px;
+  }
+
+  .login-right button {
+    padding: 12px;
+    font-size: 16px;
+  }
+}

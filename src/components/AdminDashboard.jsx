@@ -378,34 +378,37 @@ function AdminDashboard() {
           className="tab-panel"
         >
           <button className="btn btn-primary mb-3" onClick={() => setShowAddEmployee(true)}>Add Employee</button>
-          <table className="table table-striped table-bordered table-hover">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Department</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Password</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map((emp) => (
-                <tr key={emp.id}>
-                  <td>{emp.name}</td>
-                  <td>{emp.role}</td>
-                  <td>{emp.department}</td>
-                  <td>{emp.email}</td>
-                  <td>{emp.username}</td>
-                  <td>{emp.password}</td>
-                  <td>
-                    <button className="btn btn-sm btn-warning me-2" onClick={() => openEditEmployee(emp)}>Edit</button>
-                    <button className="btn btn-sm btn-danger" onClick={() => confirmDeleteEmployee(emp)}>Delete</button>
-                  </td>
+          <div className="table-responsive">
+            <table className="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>Email</th>
+                  <th>Username</th>
+                  <th>Password</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {employees.map((emp) => (
+                  <tr key={emp.id}>
+                    <td>{emp.name}</td>
+                    <td>{emp.role}</td>
+                    <td>{emp.department}</td>
+                    <td>{emp.email}</td>
+                    <td>{emp.username}</td>
+                    <td>{emp.password}</td>
+                    <td>
+                      <button className="btn btn-sm btn-warning me-2" onClick={() => openEditEmployee(emp)}>Edit</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => confirmDeleteEmployee(emp)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div
@@ -416,30 +419,33 @@ function AdminDashboard() {
           className="tab-panel"
         >
           <button className="btn btn-primary mb-3" onClick={() => setShowAddDepartment(true)}>Add Department</button>
-          <table className="table table-striped table-bordered table-hover">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {departments.map((dept) => (
-                <tr key={dept.id}>
-                  <td>{dept.name}</td>
-                  <td>{dept.description}</td>
-                  <td>
-                    {dept.name !== 'Administration' && (
-                    <button className="btn btn-sm btn-warning me-2" onClick={() => openEditDepartment(dept)}>Edit</button>
-                    )}
-                    {dept.name !== 'Administration' && (
-                      <button className="btn btn-sm btn-danger" onClick={() => confirmDeleteDepartment(dept)}>Delete</button>
-                    )}
-                  </td>
+          <div className="table-responsive">
+            <table className="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {departments.map((dept) => (
+                  <tr key={dept.id}>
+                    <td>{dept.name}</td>
+                    <td>{dept.description}</td>
+                    <td>
+                      {dept.name !== 'Administration' && (
+                      <button className="btn btn-sm btn-warning me-2" onClick={() => openEditDepartment(dept)}>Edit</button>
+                      )}
+                      {dept.name !== 'Administration' && (
+                        <button className="btn btn-sm btn-danger" onClick={() => confirmDeleteDepartment(dept)}>Delete</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div

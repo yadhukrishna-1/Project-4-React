@@ -1,144 +1,194 @@
-import React from 'react';
-import { Card, Row, Col, Badge, ListGroup } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
 
 function EmployeeDashboard() {
-  // Sample data - in a real app, this would come from an API
-  const user = {
-    name: "Mike Developer",
-    email: "mike@company.com",
-    department: "Engineering",
-    role: "employee",
-    manager: "Sarah Manager",
-    performance: "Excellent",
-    joinDate: "2024-03-01"
-  };
-
-  const tasks = [
-    {
-      title: "Complete User Authentication Module",
-      description: "Implement secure user login system",
-      dueDate: "2024-08-30",
-      status: "In Progress"
-    }
-  ];
-
-  const taskSummary = {
-    total: 1,
+  const [user, setUser] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [manager, setManager] = useState(null);
+  const [taskSummary, setTaskSummary] = useState({
+    total: 0,
     completed: 0,
-    inProgress: 1,
+    inProgress: 0,
     pending: 0
-  };
+  });
+
+  useEffect(() => {
+    // Fetch logged-in user from localStorage
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+      setUser(loggedInUser);
+    }
+
+    // Fetch all employees to find manager
+    const allEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+    if (loggedInUser) {
+      const userManager = allEmployees.find(emp =>
+        emp.department === loggedInUser.department && emp.role === 'manager'
+      );
+      setManager(userManager);
+    }
+
+    // Fetch tasks assigned to this employee
+    const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    if (loggedInUser) {
+      const employeeTasks = allTasks.filter(task => task.assignedTo === loggedInUser.id);
+      setTasks(employeeTasks);
+
+      // Calculate task summary
+      const summary = {
+        total: employeeTasks.length,
+        completed: employeeTasks.filter(task => task.status === 'completed').length,
+        inProgress: employeeTasks.filter(task => task.status === 'active').length,
+        pending: employeeTasks.filter(task => task.status === 'pending').length
+      };
+      setTaskSummary(summary);
+    }
+  }, []);
 
 
+
+  // Loading state check
+  if (!user) {
+    return (
+      <div style={{textAlign: 'center', marginTop: '50px'}}>
+        <div style={{
+          border: '4px solid #e9ecef',
+          borderTop: '4px solid #0d6efd',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto'
+        }} role="status">
+          <span style={{position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden'}}>Loading...</span>
+        </div>
+        <p style={{marginTop: '10px'}}>Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h2 className="mb-4">Employee Dashboard</h2>
-      <p className="lead">Welcome back, {user.name}</p>
-      
-      <Row>
-        <Col md={8}>
-          <Card className="mb-4">
-            <Card.Header>
-              <h5 className="mb-0">My Tasks</h5>
-              <small className="text-muted">Tasks assigned to you</small>
-            </Card.Header>
-            <Card.Body>
-              {tasks.map((task, index) => (
-                <div key={index} className="border-start border-4 border-primary ps-3 mb-3">
-                  <h6>{task.title}</h6>
-                  <p className="text-muted mb-1">{task.description}</p>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <small className="text-muted">Due: {task.dueDate}</small>
-                    <Badge bg={task.status === "In Progress" ? "warning" : "success"}>
-                      {task.status}
-                    </Badge>
+      <p style={{fontSize: '1.25rem', fontWeight: 300}}>Welcome back, {user.name}</p>
+
+      <div style={{display: 'flex'}}>
+        <div style={{flex: 2, marginRight: '20px'}}>
+          <div style={{border: '1px solid #ddd', borderRadius: '5px', marginBottom: '20px'}}>
+            <div style={{padding: '10px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd'}}>
+              <h5 style={{margin: 0}}>My Tasks</h5>
+              <small style={{color: '#6c757d'}}>Tasks assigned to you</small>
+            </div>
+            <div style={{padding: '15px'}}>
+              {tasks.length === 0 ? (
+                <p style={{color: '#6c757d'}}>No tasks assigned yet.</p>
+              ) : (
+                tasks.map((task, index) => (
+                  <div key={task.id || index} style={{borderLeft: '4px solid #0d6efd', paddingLeft: '15px', marginBottom: '15px'}}>
+                    <h6>{task.title}</h6>
+                    <p style={{color: '#6c757d', marginBottom: '5px'}}>{task.description}</p>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <small style={{color: '#6c757d'}}>Due: {task.dueDate || 'N/A'}</small>
+                      <div style={{
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        backgroundColor: task.status === "active" ? "#ffc107" : task.status === "completed" ? "#198754" : "#6c757d",
+                        color: 'white',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                        textTransform: 'capitalize'
+                      }}>
+                        {task.status === "active" ? "In Progress" : task.status}
+                      </div>
+                    </div>
                   </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div style={{flex: 1}}>
+          <div style={{border: '1px solid #ddd', borderRadius: '5px', marginBottom: '20px'}}>
+            <div style={{padding: '10px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd'}}>
+              <h5 style={{margin: 0}}>My Profile</h5>
+            </div>
+            <div style={{padding: '15px'}}>
+              <div style={{textAlign: 'center', marginBottom: '15px'}}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  backgroundColor: '#0d6efd',
+                  borderRadius: '50%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1.5rem'
+                }}>
+                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </div>
-              ))}
-            </Card.Body>
-          </Card>
-        </Col>
-        
-        <Col md={4}>
-          <Card className="mb-4">
-            <Card.Header>
-              <h5 className="mb-0">My Profile</h5>
-            </Card.Header>
-            <Card.Body>
-              <div className="text-center mb-3">
-                <div className="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
-                     style={{width: '60px', height: '60px', color: 'white', fontWeight: 'bold', fontSize: '1.5rem'}}>
-                  MD
-                </div>
-                <h5 className="mt-2 mb-0">{user.name}</h5>
-                <p className="text-muted">{user.email}</p>
+                <h5 style={{marginTop: '10px', marginBottom: 0}}>{user.name}</h5>
+                <p style={{color: '#6c757d'}}>{user.email}</p>
               </div>
-              
-              <ListGroup variant="flush">
-                <ListGroup.Item className="d-flex justify-content-between px-0">
+
+              <div style={{padding: 0, margin: 0, listStyleType: 'none'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
                   <span>Department:</span>
-                  <span className="fw-bold">{user.department}</span>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between px-0">
+                  <span style={{fontWeight: 'bold'}}>{user.department}</span>
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
                   <span>Role:</span>
-                  <span className="fw-bold">{user.role}</span>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between px-0">
+                  <span style={{fontWeight: 'bold'}}>{user.role}</span>
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
                   <span>Manager:</span>
-                  <span className="fw-bold">{user.manager}</span>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between px-0">
+                  <span style={{fontWeight: 'bold'}}>{manager ? manager.name : 'N/A'}</span>
+                </div>
+                <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
                   <span>Performance:</span>
-                  <Badge bg={user.performance === "Excellent" ? "success" : "warning"}>
-                    {user.performance}
-                  </Badge>
-                </ListGroup.Item>
-                <ListGroup.Item className="d-flex justify-content-between px-0">
-                  <span>Join Date:</span>
-                  <span className="fw-bold">{user.joinDate}</span>
-                </ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-          </Card>
-          
-          <Card className="mb-4">
-            <Card.Header>
-              <h5 className="mb-0">Task Summary</h5>
-            </Card.Header>
-            <Card.Body>
-              <Row className="text-center">
-                <Col xs={3}>
-                  <div className="border rounded p-2">
-                    <h4 className="mb-0 text-primary">{taskSummary.total}</h4>
-                    <small>Total</small>
+                  <div style={{
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    backgroundColor: user.performance === "Excellent" ? "#198754" : user.performance === "Average" ? "#ffc107" : "#6c757d",
+                    color: 'white',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    textTransform: 'capitalize'
+                  }}>
+                    {user.performance || 'Not Set'}
                   </div>
-                </Col>
-                <Col xs={3}>
-                  <div className="border rounded p-2">
-                    <h4 className="mb-0 text-success">{taskSummary.completed}</h4>
-                    <small>Done</small>
-                  </div>
-                </Col>
-                <Col xs={3}>
-                  <div className="border rounded p-2">
-                    <h4 className="mb-0 text-warning">{taskSummary.inProgress}</h4>
-                    <small>Active</small>
-                  </div>
-                </Col>
-                <Col xs={3}>
-                  <div className="border rounded p-2">
-                    <h4 className="mb-0 text-secondary">{taskSummary.pending}</h4>
-                    <small>Pending</small>
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{border: '1px solid #ddd', borderRadius: '5px', marginBottom: '20px'}}>
+            <div style={{padding: '10px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd'}}>
+              <h5 style={{margin: 0}}>Task Summary</h5>
+            </div>
+            <div style={{padding: '15px', display: 'flex', justifyContent: 'space-around', textAlign: 'center'}}>
+              <div style={{border: '1px solid #ddd', borderRadius: '5px', padding: '10px', flex: 1, margin: '0 5px'}}>
+                <h4 style={{margin: 0, color: '#0d6efd'}}>{taskSummary.total}</h4>
+                <small>Total</small>
+              </div>
+              <div style={{border: '1px solid #ddd', borderRadius: '5px', padding: '10px', flex: 1, margin: '0 5px'}}>
+                <h4 style={{margin: 0, color: '#198754'}}>{taskSummary.completed}</h4>
+                <small>Done</small>
+              </div>
+              <div style={{border: '1px solid #ddd', borderRadius: '5px', padding: '10px', flex: 1, margin: '0 5px'}}>
+                <h4 style={{margin: 0, color: '#ffc107'}}>{taskSummary.inProgress}</h4>
+                <small>Active</small>
+              </div>
+              <div style={{border: '1px solid #ddd', borderRadius: '5px', padding: '10px', flex: 1, margin: '0 5px'}}>
+                <h4 style={{margin: 0, color: '#6c757d'}}>{taskSummary.pending}</h4>
+                <small>Pending</small>
+              </div>
+            </div>
+          </div>
 
 
-        </Col>
-      </Row>
+        </div>
+      </div>
 
 
     </div>

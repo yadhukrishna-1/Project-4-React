@@ -31,3 +31,36 @@
 .progress-bar {
   border-radius: 10px;
 }
+
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Global responsive styles */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
