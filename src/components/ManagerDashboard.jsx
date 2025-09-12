@@ -206,10 +206,15 @@ function ManagerDashboard() {
                         <div>
                           <small className="text-muted">Due: {task.dueDate || 'N/A'}</small>
                         </div>
+                        {task.feedback && (
+                          <div>
+                            <small className="text-muted">Feedback: {task.feedback}</small>
+                          </div>
+                        )}
                       </div>
                       <div>
-                        <Badge bg={task.status === 'completed' ? 'success' : 'warning'} className="me-2">
-                          {task.status}
+                        <Badge bg={task.status === 'completed' ? 'success' : task.status === 'active' ? 'warning' : 'secondary'} className="me-2">
+                          {task.status === 'active' ? 'In Progress' : task.status}
                         </Badge>
                         {task.status === 'active' && (
                           <Button size="sm" variant="outline-success" onClick={() => {

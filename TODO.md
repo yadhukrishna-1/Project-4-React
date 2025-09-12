@@ -1,8 +1,6 @@
-# TODO: Refactor EmployeeDashboard to use plain divs
+# TODO: EmployeeDashboard Real-time Task Updates
 
-- [x] Replace Card components with divs and add CSS classes for styling
-- [x] Replace Row and Col with divs using flexbox layout
-- [x] Replace Badge components with divs with background colors
-- [x] Replace ListGroup with ul/li elements
-- [x] Add inline styles or CSS classes for layout and appearance
-- [ ] Test the refactored component for functionality and layout
+- [x] Add storage event listener in EmployeeDashboard.jsx to update tasks on localStorage changes
+- [ ] Test cross-tab task updates by assigning tasks in ManagerDashboard and verifying in EmployeeDashboard in another tab
+- [ ] Verify same-tab updates still work correctly
+- [ ] Consider adding refresh button or global state for same-tab real-time updates if needed

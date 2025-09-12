@@ -44,6 +44,57 @@ function EmployeeDashboard() {
     }
   }, []);
 
+  // Listen for localStorage changes (cross-tab updates)
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'tasks') {
+        const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        if (user) {
+          const employeeTasks = allTasks.filter(task => task.assignedTo === user.id);
+          setTasks(employeeTasks);
+
+          // Update task summary
+          const summary = {
+            total: employeeTasks.length,
+            completed: employeeTasks.filter(task => task.status === 'completed').length,
+            inProgress: employeeTasks.filter(task => task.status === 'active').length,
+            pending: employeeTasks.filter(task => task.status === 'pending').length
+          };
+          setTaskSummary(summary);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [user]);
+
+  // Update task status or feedback
+  const updateTask = (taskId, field, value) => {
+    const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const updatedTasks = allTasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, [field]: value };
+      }
+      return task;
+    });
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    // Update local state for current user tasks
+    const employeeTasks = updatedTasks.filter(task => task.assignedTo === user.id);
+    setTasks(employeeTasks);
+
+    // Update task summary
+    const summary = {
+      total: employeeTasks.length,
+      completed: employeeTasks.filter(task => task.status === 'completed').length,
+      inProgress: employeeTasks.filter(task => task.status === 'active').length,
+      pending: employeeTasks.filter(task => task.status === 'pending').length
+    };
+    setTaskSummary(summary);
+  };
 
   // Loading state check
   if (!user) {
@@ -86,18 +137,30 @@ function EmployeeDashboard() {
                     <p style={{color: '#6c757d', marginBottom: '5px'}}>{task.description}</p>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <small style={{color: '#6c757d'}}>Due: {task.dueDate || 'N/A'}</small>
-                      <div style={{
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        backgroundColor: task.status === "active" ? "#ffc107" : task.status === "completed" ? "#198754" : "#6c757d",
-                        color: 'white',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold',
-                        textTransform: 'capitalize'
-                      }}>
-                        {task.status === "active" ? "In Progress" : task.status}
+                      <div>
+                        <select
+                          value={task.status}
+                          onChange={(e) => updateTask(task.id, 'status', e.target.value)}
+                          style={{marginRight: '10px'}}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="active">In Progress</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                        <input
+                          type="text"
+                          placeholder="Add feedback"
+                          value={task.feedback || ''}
+                          onChange={(e) => updateTask(task.id, 'feedback', e.target.value)}
+                          style={{padding: '2px 5px', width: '200px'}}
+                        />
                       </div>
                     </div>
+                    {task.feedback && (
+                      <div style={{marginTop: '5px', fontStyle: 'italic', color: '#6c757d'}}>
+                        Feedback: {task.feedback}
+                      </div>
+                    )}
                   </div>
                 ))
               )}
