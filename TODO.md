@@ -1,6 +1,13 @@
-# TODO: EmployeeDashboard Real-time Task Updates
+# EmployeeDashboard Bootstrap Refactor TODO
 
-- [x] Add storage event listener in EmployeeDashboard.jsx to update tasks on localStorage changes
-- [ ] Test cross-tab task updates by assigning tasks in ManagerDashboard and verifying in EmployeeDashboard in another tab
-- [ ] Verify same-tab updates still work correctly
-- [ ] Consider adding refresh button or global state for same-tab real-time updates if needed
+- [x] Replace loading spinner inline styles with Bootstrap spinner classes
+- [x] Replace welcome message inline styles with Bootstrap typography classes
+- [x] Replace main container flex layout with Bootstrap d-flex classes
+- [x] Replace tasks card styles with Bootstrap card classes
+- [x] Replace task list items with Bootstrap utility classes
+- [x] Replace select and input elements with Bootstrap form classes
+- [x] Replace profile card styles with Bootstrap card classes
+- [x] Replace profile avatar styles with Bootstrap classes
+- [x] Replace profile details list with Bootstrap list-group classes
+- [x] Replace task summary card with Bootstrap card and grid classes
+- [x] Replace task summary boxes with Bootstrap utility classes
