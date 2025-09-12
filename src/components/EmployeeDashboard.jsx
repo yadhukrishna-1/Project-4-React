@@ -45,7 +45,6 @@ function EmployeeDashboard() {
   }, []);
 
 
-
   // Loading state check
   if (!user) {
     return (
