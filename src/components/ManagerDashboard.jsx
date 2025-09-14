@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// 📊 ManagerDashboard: Simplified component using plain Bootstrap classes for consistency
-// 🚀 Purpose: Manage team, tasks, and performance without complex React wrappers
 
 function ManagerDashboard() {
   // 🔄 State management for dashboard data
@@ -9,8 +7,10 @@ function ManagerDashboard() {
   const [departments, setDepartments] = useState([]); // Departments
   const [tasks, setTasks] = useState([]); // All tasks
   const [manager, setManager] = useState(null); // Logged-in manager
+
   const [showTaskModal, setShowTaskModal] = useState(false); // Modal for adding tasks
   const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '', dueDate: '' }); // New task form
+  
   const [showPerformanceModal, setShowPerformanceModal] = useState(false); // Modal for performance
   const [selectedEmployee, setSelectedEmployee] = useState(null); // Selected employee for performance
   const [performanceLevel, setPerformanceLevel] = useState(''); // Performance level
@@ -168,9 +168,8 @@ function ManagerDashboard() {
                       <div>
                         <div className="fw-bold">{member.name}</div>
                         <small className="text-muted">{member.email}</small>
-                        <div>
+                        <br />
                           <small className="text-muted">{member.department}</small>
-                        </div>
                       </div>
                     </div>
                     <div>

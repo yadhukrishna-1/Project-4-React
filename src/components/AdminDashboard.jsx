@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 const DEMO_USERS = [
   {
     id: 1,
-    name: 'Abhin (SP)',
-    role: 'admin',
+    name: 'Abhinav S',
+    role: 'admin HR',
+    isAdminHR: true,
     department: 'Administration',
     email: 'superadmin@hrmconnect.com',
     username: 'superadmin',
@@ -45,7 +46,7 @@ const defaultDept = [
   }
 ];
 
-function AdminDashboard() {
+function AdminDashboard({ user }) {
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showAddEmployee, setShowAddEmployee] = useState(false);
@@ -63,6 +64,9 @@ function AdminDashboard() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteType, setDeleteType] = useState(null); // 'employee' or 'department'
   const [deleteError, setDeleteError] = useState(''); // Error message for delete validation
+
+  // Audit log for employee additions and removals
+  const [auditLog, setAuditLog] = useState([]);
 
   useEffect(() => {
     // localStorage.removeItem('employees');
@@ -103,10 +107,35 @@ function AdminDashboard() {
   };
 
   const addEmployee = () => {
-    const emp = { ...newEmployee, id: Date.now() };
+    // Set role for new admins as Normal HR (isAdminHR: false)
+    let roleToSet = newEmployee.role;
+    let isAdminHRFlag = false;
+    if (newEmployee.role === 'admin') {
+      roleToSet = 'admin';
+      isAdminHRFlag = false; // Normal HR
+    } else {
+      roleToSet = newEmployee.role;
+      isAdminHRFlag = false;
+    }
+
+    const emp = { ...newEmployee, id: Date.now(), role: roleToSet, isAdminHR: isAdminHRFlag };
     const updatedEmployees = [...employees, emp];
     setEmployees(updatedEmployees);
     saveToLocalStorage('employees', updatedEmployees);
+
+    // Log addition in audit log
+    const newLogEntry = {
+      id: Date.now(),
+      type: 'addition',
+      employeeName: emp.name,
+      hrName: user.name,
+      timestamp: new Date().toISOString(),
+      reason: null
+    };
+    const updatedAuditLog = [...auditLog, newLogEntry];
+    setAuditLog(updatedAuditLog);
+    saveToLocalStorage('auditLog', updatedAuditLog);
+
     setNewEmployee({ name: '', role: 'employee', department: '', email: '', username: '', password: '' });
     setShowAddEmployee(false);
   };
@@ -131,6 +160,32 @@ function AdminDashboard() {
   };
 
   const saveEditEmployee = () => {
+    // If current user is Admin HR and editing their own data to hand over position
+    if (user.isAdminHR && editEmployee.id === user.id) {
+      // If isAdminHR flag changed from true to false, find another admin to assign isAdminHR true
+      if (editEmployee.isAdminHR === false) {
+        // Find another admin to assign isAdminHR true
+        const otherAdmins = employees.filter(emp => emp.role === 'admin' && emp.id !== editEmployee.id);
+        if (otherAdmins.length > 0) {
+          // Assign isAdminHR true to the first other admin
+          const newAdminHR = { ...otherAdmins[0], isAdminHR: true };
+          const updatedEmployees = employees.map(emp => {
+            if (emp.id === newAdminHR.id) return newAdminHR;
+            if (emp.id === editEmployee.id) return editEmployee;
+            return emp;
+          });
+          setEmployees(updatedEmployees);
+          saveToLocalStorage('employees', updatedEmployees);
+          setShowEditEmployee(false);
+          setEditEmployee(null);
+          return;
+        } else {
+          alert('Cannot hand over Admin HR role as no other admin exists.');
+          return;
+        }
+      }
+    }
+
     const updatedEmployees = employees.map(emp => emp.id === editEmployee.id ? editEmployee : emp);
     setEmployees(updatedEmployees);
     saveToLocalStorage('employees', updatedEmployees);
@@ -145,6 +200,9 @@ function AdminDashboard() {
     setDeleteError(''); // Reset error
     setShowDeleteConfirm(true);
   };
+
+  // New state for removal reason
+  const [removalReason, setRemovalReason] = useState('resignation');
 
   // Edit department handlers
   const openEditDepartment = (dept) => {
@@ -183,6 +241,20 @@ function AdminDashboard() {
           return; // Prevent deletion
         }
       }
+
+      // Log removal in audit log with reason and HR responsible
+      const newLogEntry = {
+        id: Date.now(),
+        type: 'removal',
+        employeeName: deleteTarget.name,
+        hrName: user.name,
+        timestamp: new Date().toISOString(),
+        reason: removalReason
+      };
+      const updatedAuditLog = [...auditLog, newLogEntry];
+      setAuditLog(updatedAuditLog);
+      saveToLocalStorage('auditLog', updatedAuditLog);
+
       const updatedEmployees = employees.filter(emp => emp.id !== deleteTarget.id);
       setEmployees(updatedEmployees);
       saveToLocalStorage('employees', updatedEmployees);
@@ -214,6 +286,8 @@ function AdminDashboard() {
   const managers = employees.filter(emp => emp.role === 'manager').length;
   const admins = employees.filter(emp => emp.role === 'admin').length;
 
+  // Determine if current user is Admin HR
+  const isAdminHR = user?.isAdminHR === true;
 
   return (
     <div>
@@ -271,6 +345,21 @@ function AdminDashboard() {
               Analytics
             </button>
           </li>
+          {isAdminHR && (
+            <li className="nav-item" role="presentation">
+              <button
+                className={`nav-link ${activeTab === 'hrAnalysis' ? 'active' : ''}`}
+                id="hrAnalysis-tab-button"
+                type="button"
+                role="tab"
+                aria-controls="hrAnalysis-tab"
+                aria-selected={activeTab === 'hrAnalysis'}
+                onClick={() => setActiveTab('hrAnalysis')}
+              >
+                HR Analysis
+              </button>
+            </li>
+          )}
         </ul>
 
         <div
@@ -370,6 +459,7 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Employees Tab */}
         <div
           role="tabpanel"
           id="employees-tab"
@@ -394,8 +484,12 @@ function AdminDashboard() {
               <tbody>
                 {employees.map((emp) => (
                   <tr key={emp.id}>
-                    <td>{emp.name}</td>
-                    <td>{emp.role}</td>
+                    <td>
+                      {emp.role === 'admin' && emp.isAdminHR
+                        ? <span className="badge bg-success">{emp.name} (Admin HR)</span>
+                        : emp.name}
+                    </td>
+                    <td>{emp.role === 'admin' ? 'Admin' : emp.role}</td>
                     <td>{emp.department}</td>
                     <td>{emp.email}</td>
                     <td>{emp.username}</td>
@@ -479,6 +573,43 @@ function AdminDashboard() {
             </div>
           </div>
         </div>
+        {isAdminHR && (
+          <div
+            role="tabpanel"
+            id="hrAnalysis-tab"
+            aria-labelledby="hrAnalysis-tab-button"
+            hidden={activeTab !== 'hrAnalysis'}
+            className="tab-panel"
+          >
+            <h5>Employee Additions and Removals Analysis</h5>
+            {auditLog.length === 0 ? (
+              <p>No audit data available.</p>
+            ) : (
+              <table className="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Employee Name</th>
+                    <th>HR Responsible</th>
+                    <th>Reason (if removal)</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditLog.map((log) => (
+                    <tr key={log.id}>
+                      <td>{log.type === 'addition' ? 'Added' : 'Removed'}</td>
+                      <td>{log.employeeName}</td>
+                      <td>{log.hrName}</td>
+                      <td>{log.reason || '-'}</td>
+                      <td>{new Date(log.timestamp).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Add Employee Modal */}
@@ -552,6 +683,19 @@ function AdminDashboard() {
                     onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
                   />
                 </div>
+                {/* Show Admin HR status for info only */}
+                {newEmployee.role === 'admin' && (
+                  <div className="mb-3">
+                    <label className="form-label">Admin HR Status</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value="Normal HR (not Admin HR)"
+                      disabled
+                    />
+                    <small className="text-muted">Only the default admin is Admin HR. New admins are Normal HR.</small>
+                  </div>
+                )}
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddEmployee(false)}>Close</button>

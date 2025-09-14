@@ -19,7 +19,7 @@ function Login({ onLogin }) {
     if (user) {
       console.log('Login successful for user:', user);
       // Store logged-in user in localStorage for dashboard access
-      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      localStorage.setItem('loggedInUser', JSON.stringify(user)); 
       onLogin(user);
     } else {
       console.log('Login failed: Invalid username or password');
@@ -33,7 +33,6 @@ function Login({ onLogin }) {
         {/* Left side */}
         <div className="login-left">
           <img src="img-3.png" alt="HRM Logo" className="logo blue-icon" />
-          {/* D:\programs\PROJECTS\3rd-(React)\HRM-Connect\public\img-3.png           */}
           <h2>HRM-CONNECT</h2>
           <p>Streamlining HR operations with ease and efficiency.</p>
         </div>
