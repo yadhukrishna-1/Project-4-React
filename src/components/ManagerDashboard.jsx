@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, ListGroup, Badge, Button, Modal, Form, Tabs, Tab } from 'react-bootstrap';
+// 📊 ManagerDashboard: Simplified component using plain Bootstrap classes for consistency
+// 🚀 Purpose: Manage team, tasks, and performance without complex React wrappers
 
 function ManagerDashboard() {
-  const [activeTab, setActiveTab] = useState('myTeam');
-  const [employees, setEmployees] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [manager, setManager] = useState(null);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '', dueDate: '' });
-  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [performanceLevel, setPerformanceLevel] = useState('');
+  // 🔄 State management for dashboard data
+  const [activeTab, setActiveTab] = useState('myTeam'); // Current active tab
+  const [employees, setEmployees] = useState([]); // All employees
+  const [departments, setDepartments] = useState([]); // Departments
+  const [tasks, setTasks] = useState([]); // All tasks
+  const [manager, setManager] = useState(null); // Logged-in manager
+  const [showTaskModal, setShowTaskModal] = useState(false); // Modal for adding tasks
+  const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '', dueDate: '' }); // New task form
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false); // Modal for performance
+  const [selectedEmployee, setSelectedEmployee] = useState(null); // Selected employee for performance
+  const [performanceLevel, setPerformanceLevel] = useState(''); // Performance level
 
   useEffect(() => {
     // Fetch employees, departments, tasks from localStorage
@@ -104,44 +106,60 @@ function ManagerDashboard() {
 
   return (
     <div>
-      <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
-        <Tab eventKey="myTeam" title="My Team">
-          <Row className="mb-4">
-            <Col md={4} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+      {/* Tab Navigation: Simple button-based tabs for switching views */}
+      <ul className="nav nav-tabs mb-4">
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === 'myTeam' ? 'active' : ''}`} onClick={() => setActiveTab('myTeam')}>My Team</button>
+        </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === 'task' ? 'active' : ''}`} onClick={() => setActiveTab('task')}>Task</button>
+        </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === 'performance' ? 'active' : ''}`} onClick={() => setActiveTab('performance')}>Performance</button>
+        </li>
+      </ul>
+
+      {/*  My Team Tab Content */}
+      {activeTab === 'myTeam' && (
+        <>
+          {/*  Stats Row: Grid layout for summary cards */}
+          <div className="row mb-4">
+            <div className="col-md-4 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-primary">{teamMembers.length}</h3>
                   <p className="text-muted">Team Members</p>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-success">{completedTasks}</h3>
                   <p className="text-muted">Completed Tasks</p>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-warning">{activeTasks}</h3>
                   <p className="text-muted">Active Tasks</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <Card.Header>
+          {/*  Team Members Card */}
+          <div className="card">
+            <div className="card-header">
               <h5 className="mb-0">Team Members</h5>
               <small className="text-muted">Manage your direct reports</small>
-            </Card.Header>
-            <Card.Body>
-              <ListGroup variant="flush">
+            </div>
+            <div className="card-body">
+              <ul className="list-group list-group-flush">
                 {teamMembers.map((member) => (
-                  <ListGroup.Item key={member.id} className="px-0 d-flex justify-content-between align-items-center">
+                  <li key={member.id} className="list-group-item px-0 d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
                       <div className="me-3 bg-primary rounded-circle d-flex align-items-center justify-content-center"
                            style={{ width: '45px', height: '45px', color: 'white', fontWeight: 'bold' }}>
@@ -156,50 +174,55 @@ function ManagerDashboard() {
                       </div>
                     </div>
                     <div>
-                      <Badge bg={member.performance === "Excellent" ? "success" : member.performance === "Average" ? "warning" : "secondary"} className="me-2">
+                      <span className={`badge ${member.performance === "Excellent" ? "bg-success" : member.performance === "Average" ? "bg-warning" : "bg-secondary"} me-2`}>
                         {member.performance || 'N/A'}
-                      </Badge>
-                      <Button variant="outline-primary" size="sm" onClick={() => openPerformanceModal(member)}>Set Performance</Button>
+                      </span>
+                      <button className="btn btn-outline-primary btn-sm" onClick={() => openPerformanceModal(member)}>Set Performance</button>
                     </div>
-                  </ListGroup.Item>
+                  </li>
                 ))}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Tab>
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
 
-        <Tab eventKey="task" title="Task">
-          <Row className="mb-4">
-            <Col md={6} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+      {/*  Task Tab Content */}
+      {activeTab === 'task' && (
+        <>
+          {/* 📋 Task Stats Row */}
+          <div className="row mb-4">
+            <div className="col-md-6 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-success">{completedTasks}</h3>
                   <p className="text-muted">Completed Tasks</p>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={6} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-6 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-warning">{activeTasks}</h3>
                   <p className="text-muted">Active Tasks</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <Card.Header className="d-flex justify-content-between align-items-center">
+          {/*  Task Management Card */}
+          <div className="card">
+            <div className="card-header d-flex justify-content-between align-items-center">
               <h5 className="mb-0">Task Management</h5>
-              <Button variant="primary" size="sm" onClick={openTaskModal}>Add Task</Button>
-            </Card.Header>
-            <Card.Body>
+              <button className="btn btn-primary btn-sm" onClick={openTaskModal}>Add Task</button>
+            </div>
+            <div className="card-body">
               {teamTasks.length === 0 ? (
                 <p>No tasks assigned yet.</p>
               ) : (
-                <ListGroup>
+                <ul className="list-group">
                   {teamTasks.map(task => (
-                    <ListGroup.Item key={task.id} className="d-flex justify-content-between align-items-center">
+                    <li key={task.id} className="list-group-item d-flex justify-content-between align-items-center">
                       <div>
                         <div className="fw-bold">{task.title}</div>
                         <small className="text-muted">{task.description}</small>
@@ -213,46 +236,51 @@ function ManagerDashboard() {
                         )}
                       </div>
                       <div>
-                        <Badge bg={task.status === 'completed' ? 'success' : task.status === 'active' ? 'warning' : 'secondary'} className="me-2">
+                        <span className={`badge ${task.status === 'completed' ? 'bg-success' : task.status === 'active' ? 'bg-warning' : 'bg-secondary'} me-2`}>
                           {task.status === 'active' ? 'In Progress' : task.status}
-                        </Badge>
+                        </span>
                         {task.status === 'active' && (
-                          <Button size="sm" variant="outline-success" onClick={() => {
+                          <button className="btn btn-outline-success btn-sm" onClick={() => {
                             const updatedTasks = tasks.map(t => t.id === task.id ? { ...t, status: 'completed' } : t);
                             setTasks(updatedTasks);
                             localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-                          }}>Mark Complete</Button>
+                          }}>Mark Complete</button>
                         )}
                       </div>
-                    </ListGroup.Item>
+                    </li>
                   ))}
-                </ListGroup>
+                </ul>
               )}
-            </Card.Body>
-          </Card>
-        </Tab>
+            </div>
+          </div>
+        </>
+      )}
 
-        <Tab eventKey="performance" title="Performance">
-          <Row className="mb-4">
-            <Col md={12} className="mb-3">
-              <Card className="text-center h-100">
-                <Card.Body>
+      {/*  Performance Tab Content */}
+      {activeTab === 'performance' && (
+        <>
+          {/* 🎯 Performance Overview Row */}
+          <div className="row mb-4">
+            <div className="col-md-12 mb-3">
+              <div className="card text-center h-100">
+                <div className="card-body">
                   <h3 className="text-info">Team Performance Overview</h3>
                   <p className="text-muted">Monitor and analyze team performance</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <Card.Header>
+          {/*  Performance Metrics Card */}
+          <div className="card">
+            <div className="card-header">
               <h5 className="mb-0">Performance Metrics</h5>
               <small className="text-muted">Track individual and team performance</small>
-            </Card.Header>
-            <Card.Body>
-              <ListGroup variant="flush">
+            </div>
+            <div className="card-body">
+              <ul className="list-group list-group-flush">
                 {teamMembers.map((member) => (
-                  <ListGroup.Item key={member.id} className="px-0 d-flex justify-content-between align-items-center">
+                  <li key={member.id} className="list-group-item px-0 d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
                       <div className="me-3 bg-primary rounded-circle d-flex align-items-center justify-content-center"
                            style={{ width: '45px', height: '45px', color: 'white', fontWeight: 'bold' }}>
@@ -264,97 +292,113 @@ function ManagerDashboard() {
                       </div>
                     </div>
                     <div>
-                      <Badge bg={member.performance === "Excellent" ? "success" : member.performance === "Average" ? "warning" : "secondary"} className="me-2">
+                      <span className={`badge ${member.performance === "Excellent" ? "bg-success" : member.performance === "Average" ? "bg-warning" : "bg-secondary"} me-2`}>
                         {member.performance || 'N/A'}
-                      </Badge>
-                      <Button variant="outline-primary" size="sm" onClick={() => openPerformanceModal(member)}>Set Performance</Button>
+                      </span>
+                      <button className="btn btn-outline-primary btn-sm" onClick={() => openPerformanceModal(member)}>Set Performance</button>
                     </div>
-                  </ListGroup.Item>
+                  </li>
                 ))}
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Tab>
-      </Tabs>
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
 
-      {/* Task Modal */}
-      <Modal show={showTaskModal} onHide={closeTaskModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3" controlId="taskTitle">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                value={newTask.title}
-                onChange={(e) => handleTaskChange('title', e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="taskDescription">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={newTask.description}
-                onChange={(e) => handleTaskChange('description', e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="taskAssignee">
-              <Form.Label>Assign To</Form.Label>
-              <Form.Select
-                value={newTask.assignedTo}
-                onChange={(e) => handleTaskChange('assignedTo', e.target.value)}
-              >
-                <option value="">Select Employee</option>
-                {teamMembers.map(member => (
-                  <option key={member.id} value={member.id}>{member.name}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="taskDueDate">
-              <Form.Label>Due Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={newTask.dueDate}
-                onChange={(e) => handleTaskChange('dueDate', e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeTaskModal}>Cancel</Button>
-          <Button variant="primary" onClick={saveTask}>Save Task</Button>
-        </Modal.Footer>
-      </Modal>
+      {/*  Task Modal: Plain Bootstrap modal for adding tasks */}
+      <div className={`modal ${showTaskModal ? 'show' : ''}`} style={{ display: showTaskModal ? 'block' : 'none' }} tabIndex="-1">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Add New Task</h5>
+              <button type="button" className="btn-close" onClick={closeTaskModal}></button>
+            </div>
+            <div className="modal-body">
+              <form>
+                <div className="mb-3">
+                  <label className="form-label">Title</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={newTask.title}
+                    onChange={(e) => handleTaskChange('title', e.target.value)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Description</label>
+                  <textarea
+                    className="form-control"
+                    rows={3}
+                    value={newTask.description}
+                    onChange={(e) => handleTaskChange('description', e.target.value)}
+                  ></textarea>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Assign To</label>
+                  <select
+                    className="form-select"
+                    value={newTask.assignedTo}
+                    onChange={(e) => handleTaskChange('assignedTo', e.target.value)}
+                  >
+                    <option value="">Select Employee</option>
+                    {teamMembers.map(member => (
+                      <option key={member.id} value={member.id}>{member.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Due Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={newTask.dueDate}
+                    onChange={(e) => handleTaskChange('dueDate', e.target.value)}
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={closeTaskModal}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={saveTask}>Save Task</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showTaskModal && <div className="modal-backdrop show"></div>}
 
-      {/* Performance Modal */}
-      <Modal show={showPerformanceModal} onHide={closePerformanceModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Set Performance Level</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="performanceLevel">
-              <Form.Label>Performance Level</Form.Label>
-              <Form.Select
-                value={performanceLevel}
-                onChange={(e) => setPerformanceLevel(e.target.value)}
-              >
-                <option value="">Select Level</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Average">Average</option>
-                <option value="Poor">Poor</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closePerformanceModal}>Cancel</Button>
-          <Button variant="primary" onClick={savePerformance}>Save</Button>
-        </Modal.Footer>
-      </Modal>
+      {/* ⭐ Performance Modal: Plain Bootstrap modal for setting performance */}
+      <div className={`modal ${showPerformanceModal ? 'show' : ''}`} style={{ display: showPerformanceModal ? 'block' : 'none' }} tabIndex="-1">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Set Performance Level</h5>
+              <button type="button" className="btn-close" onClick={closePerformanceModal}></button>
+            </div>
+            <div className="modal-body">
+              <form>
+                <div className="mb-3">
+                  <label className="form-label">Performance Level</label>
+                  <select
+                    className="form-select"
+                    value={performanceLevel}
+                    onChange={(e) => setPerformanceLevel(e.target.value)}
+                  >
+                    <option value="">Select Level</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Average">Average</option>
+                    <option value="Poor">Poor</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={closePerformanceModal}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={savePerformance}>Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showPerformanceModal && <div className="modal-backdrop show"></div>}
     </div>
   );
 }
