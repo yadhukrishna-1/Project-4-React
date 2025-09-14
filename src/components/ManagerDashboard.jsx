@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import LeaveCalendar from './LeaveCalendar';
+
 
 function ManagerDashboard() {
   // 🔄 State management for dashboard data
@@ -36,7 +38,7 @@ function ManagerDashboard() {
   const teamMembers = employees.filter(emp => emp.department === (manager ? manager.department : '') && emp.role === 'employee');
 
   // Filter tasks assigned to team members
-  const teamTasks = tasks.filter(task => teamMembers.some(member => member.id === task.assignedTo));
+  const teamTasks = tasks.filter(task => teamMembers.some(member => member.id === Number(task.assignedTo)));
 
   // Calculate task stats
   const completedTasks = teamTasks.filter(task => task.status === 'completed').length;
@@ -53,18 +55,11 @@ function ManagerDashboard() {
     setShowTaskModal(false);
   };
 
-  // Handle performance modal open
-  const openPerformanceModal = (employee) => {
-    setSelectedEmployee(employee);
-    setPerformanceLevel(employee.performance || '');
-    setShowPerformanceModal(true);
-  };
 
-  // Handle performance modal close
-  const closePerformanceModal = () => {
-    setShowPerformanceModal(false);
-    setSelectedEmployee(null);
-    setPerformanceLevel('');
+ const clearTasks = () => {
+    localStorage.setItem('tasks', JSON.stringify([])); 
+    setTasks([]); // Clear tasks in state too
+    alert('All tasks cleared!');
   };
 
   // Handle new task input change
@@ -82,12 +77,29 @@ function ManagerDashboard() {
       ...newTask,
       id: Date.now(),
       assignedBy: manager.id,
-      status: 'active'
+      status: 'pending',
+      assignedTo: Number(newTask.assignedTo) // Ensure assignedTo is a number>>>>>>>>>>>>>>>>>>>>>>>
     };
     const updatedTasks = [...tasks, taskToSave];
     setTasks(updatedTasks);
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
     setShowTaskModal(false);
+  };
+
+
+
+    // Handle performance modal open
+  const openPerformanceModal = (employee) => {
+    setSelectedEmployee(employee);
+    setPerformanceLevel(employee.performance || '');
+    setShowPerformanceModal(true);
+  };
+
+  // Handle performance modal close
+  const closePerformanceModal = () => {
+    setShowPerformanceModal(false);
+    setSelectedEmployee(null);
+    setPerformanceLevel('');
   };
 
   // Update performance level
@@ -104,6 +116,20 @@ function ManagerDashboard() {
     closePerformanceModal();
   };
 
+
+
+  // Update leave request status
+  const updateLeaveStatus = (leaveId, status) => {
+  const allLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
+  const updatedLeaves = allLeaves.map(leave => {
+    if (leave.id === leaveId) return { ...leave, status };
+    return leave;
+  });
+  localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
+  setTasks([...tasks]); // Trigger re-render
+};
+
+
   return (
     <div>
       {/* Tab Navigation: Simple button-based tabs for switching views */}
@@ -116,6 +142,9 @@ function ManagerDashboard() {
         </li>
         <li className="nav-item">
           <button className={`nav-link ${activeTab === 'performance' ? 'active' : ''}`} onClick={() => setActiveTab('performance')}>Performance</button>
+        </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === 'leaves' ? 'active' : ''}`} onClick={() => setActiveTab('leaves')}>Leaves</button>
         </li>
       </ul>
 
@@ -252,6 +281,7 @@ function ManagerDashboard() {
               )}
             </div>
           </div>
+          <button onClick={clearTasks} className='btn btn-danger float-end'>Clear All Tasks</button>
         </>
       )}
 
@@ -303,6 +333,54 @@ function ManagerDashboard() {
           </div>
         </>
       )}
+
+{/* leave tab content */}
+{activeTab === 'leaves' && (
+  <div>
+    <h5 className="mb-3">Leave Requests</h5>
+    <div className="card">
+      <div className="card-body">
+        {/* Fetch leaves from localStorage */}
+        {(() => {
+          const allLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
+          // Only show leaves of manager's team
+          const teamLeaves = allLeaves.filter(leave => 
+            teamMembers.some(member => member.id === Number(leave.employeeId))
+          );
+          if (teamLeaves.length === 0) return <p>No leave requests.</p>;
+          return (
+            <ul className="list-group">
+              {teamLeaves.map((leave) => (
+                <li key={leave.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div className="fw-bold">{employees.find(e => e.id === leave.employeeId)?.name || 'Employee'}</div>
+                    <small>{leave.startDate} → {leave.endDate}</small>
+                    <div><small>Reason: {leave.reason}</small></div>
+                  </div>
+                  <div>
+                    {leave.status === 'pending' ? (
+                      <>
+                        <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'approved')}>Approve</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'rejected')}>Reject</button>
+                      </>
+                    ) : (
+                      <span className={`badge ${leave.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>{leave.status}</span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          );
+        })()}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
 
       {/*  Task Modal: Plain Bootstrap modal for adding tasks */}
       <div className={`modal ${showTaskModal ? 'show' : ''}`} style={{ display: showTaskModal ? 'block' : 'none' }} tabIndex="-1">

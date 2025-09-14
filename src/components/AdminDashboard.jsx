@@ -289,6 +289,18 @@ function AdminDashboard({ user }) {
   // Determine if current user is Admin HR
   const isAdminHR = user?.isAdminHR === true;
 
+
+
+
+  // Leave Requests Tab Content
+  const updateLeaveStatus = (leaveId, field, status) => {
+  const leaves = JSON.parse(localStorage.getItem('leaves')) || [];
+  const updatedLeaves = leaves.map(lv => lv.id === leaveId ? { ...lv, [field]: status } : lv);
+  localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
+  // Force re-render
+  setEmployees([...employees]);
+};
+
   return (
     <div>
       <div className="mb-4">
@@ -306,6 +318,7 @@ function AdminDashboard({ user }) {
               Overview
             </button>
           </li>
+
           <li className="nav-item" role="presentation">
             <button
               className={`nav-link ${activeTab === 'employees' ? 'active' : ''}`}
@@ -319,6 +332,7 @@ function AdminDashboard({ user }) {
               Employees
             </button>
           </li>
+
           <li className="nav-item" role="presentation">
             <button
               className={`nav-link ${activeTab === 'departments' ? 'active' : ''}`}
@@ -332,6 +346,21 @@ function AdminDashboard({ user }) {
               Departments
             </button>
           </li>
+
+          <li className="nav-item" role="presentation">
+  <button
+    className={`nav-link ${activeTab === 'leaveRequests' ? 'active' : ''}`}
+    id="leaveRequests-tab-button"
+    type="button"
+    role="tab"
+    aria-controls="leaveRequests-tab"
+    aria-selected={activeTab === 'leaveRequests'}
+    onClick={() => setActiveTab('leaveRequests')}
+  >
+    Leave Requests
+  </button>
+</li>
+
           <li className="nav-item" role="presentation">
             <button
               className={`nav-link ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -889,6 +918,60 @@ function AdminDashboard({ user }) {
           </div>
         </div>
       )}
+
+
+
+      {/* Leave Requests Tab Content */}
+      <div
+  role="tabpanel"
+  id="leaveRequests-tab"
+  aria-labelledby="leaveRequests-tab-button"
+  hidden={activeTab !== 'leaveRequests'}
+  className="tab-panel"
+>
+  <h5 className="mb-3">Employee Leave Requests</h5>
+  {(() => {
+    const leaves = JSON.parse(localStorage.getItem('leaves')) || [];
+    if (leaves.length === 0) return <p>No leave requests yet.</p>;
+
+    return (
+      <ul className="list-group">
+        {leaves.map((leave) => {
+          const employee = employees.find(e => e.id === leave.employeeId);
+          return (
+            <li key={leave.id} className="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <div className="fw-bold">{employee?.name || 'Employee'}</div>
+                <small>{leave.startDate} → {leave.endDate}</small>
+                <div><small>Reason: {leave.reason}</small></div>
+                <div><small>Manager Status: {leave.managerStatus || 'Pending'}</small></div>
+                <div><small>Admin Status: {leave.adminStatus || 'Pending'}</small></div>
+              </div>
+              <div>
+                {/* Manager approval buttons */}
+                {leave.managerStatus !== 'approved' && leave.managerStatus !== 'rejected' && (
+                  <>
+                    <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'approved')}>Manager Approve</button>
+                    <button className="btn btn-danger btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'rejected')}>Manager Reject</button>
+                  </>
+                )}
+                {/* Admin approval buttons */}
+                {leave.managerStatus === 'approved' && !leave.adminStatus && (
+                  <>
+                    <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'approved')}>Admin Approve</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'rejected')}>Admin Reject</button>
+                  </>
+                )}
+                {leave.adminStatus && <span className={`badge ${leave.adminStatus === 'approved' ? 'bg-success' : 'bg-danger'}`}>{leave.adminStatus}</span>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  })()}
+</div>
+
     </div>
   );
 }
