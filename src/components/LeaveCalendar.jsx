@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function LeaveCalendar({ user }) {
-  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [leaves, setLeaves] = useState([]);
   const [newLeave, setNewLeave] = useState({
     startDate: "",
     endDate: "",
@@ -9,13 +9,13 @@ function LeaveCalendar({ user }) {
   });
 
   useEffect(() => {
-    const storedLeaves = JSON.parse(localStorage.getItem("leaveRequests")) || [];
-    setLeaveRequests(storedLeaves);
+    const storedLeaves = JSON.parse(localStorage.getItem("leaves")) || [];
+    setLeaves(storedLeaves);
   }, []);
 
   const saveLeaves = (updated) => {
-    setLeaveRequests(updated);
-    localStorage.setItem("leaveRequests", JSON.stringify(updated));
+    setLeaves(updated);
+    localStorage.setItem("leaves", JSON.stringify(updated));
   };
 
   const submitLeaveRequest = () => {
@@ -32,11 +32,11 @@ function LeaveCalendar({ user }) {
       startDate: newLeave.startDate,
       endDate: newLeave.endDate,
       reason: newLeave.reason,
-      managerApproval: "pending",
-      hrApproval: "pending",
+      managerStatus: null,
+      adminStatus: null,
     };
 
-    const updated = [...leaveRequests, newRequest];
+    const updated = [...leaves, newRequest];
     saveLeaves(updated);
 
     setNewLeave({ startDate: "", endDate: "", reason: "" });
@@ -80,21 +80,31 @@ function LeaveCalendar({ user }) {
           <tr>
             <th>Dates</th>
             <th>Reason</th>
-            <th>Manager</th>
-            <th>HR</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {leaveRequests
+          {leaves
             .filter((leave) => leave.employeeId === user.id)
-            .map((leave) => (
-              <tr key={leave.id}>
-                <td>{leave.startDate} to {leave.endDate}</td>
-                <td>{leave.reason}</td>
-                <td>{leave.managerApproval}</td>
-                <td>{leave.hrApproval}</td>
-              </tr>
-            ))}
+            .map((leave) => {
+              let status = 'Pending';
+              if (leave.adminStatus === 'approved') {
+                status = 'Approved';
+              } else if (leave.adminStatus === 'rejected') {
+                status = 'Rejected';
+              } else if (leave.managerStatus === 'approved') {
+                status = 'Pending Admin Approval';
+              } else if (leave.managerStatus === 'rejected') {
+                status = 'Rejected by Manager';
+              }
+              return (
+                <tr key={leave.id}>
+                  <td>{leave.startDate} to {leave.endDate}</td>
+                  <td>{leave.reason}</td>
+                  <td>{status}</td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     </div>

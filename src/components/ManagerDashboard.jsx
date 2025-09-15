@@ -9,6 +9,7 @@ function ManagerDashboard() {
   const [departments, setDepartments] = useState([]); // Departments
   const [tasks, setTasks] = useState([]); // All tasks
   const [manager, setManager] = useState(null); // Logged-in manager
+  const [leaves, setLeaves] = useState([]); // Leave requests
 
   const [showTaskModal, setShowTaskModal] = useState(false); // Modal for adding tasks
   const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '', dueDate: '' }); // New task form
@@ -18,14 +19,16 @@ function ManagerDashboard() {
   const [performanceLevel, setPerformanceLevel] = useState(''); // Performance level
 
   useEffect(() => {
-    // Fetch employees, departments, tasks from localStorage
+    // Fetch employees, departments, tasks, leaves from localStorage
     const storedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
     const storedDepartments = JSON.parse(localStorage.getItem('departments')) || [];
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const storedLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
 
     setEmployees(storedEmployees);
     setDepartments(storedDepartments);
     setTasks(storedTasks);
+    setLeaves(storedLeaves);
 
     // Simulate logged-in manager from localStorage or context
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -77,7 +80,7 @@ function ManagerDashboard() {
       ...newTask,
       id: Date.now(),
       assignedBy: manager.id,
-      status: 'pending',
+      status: 'active',
       assignedTo: Number(newTask.assignedTo) // Ensure assignedTo is a number>>>>>>>>>>>>>>>>>>>>>>>
     };
     const updatedTasks = [...tasks, taskToSave];
@@ -119,15 +122,13 @@ function ManagerDashboard() {
 
 
   // Update leave request status
-  const updateLeaveStatus = (leaveId, status) => {
-  const allLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
-  const updatedLeaves = allLeaves.map(leave => {
-    if (leave.id === leaveId) return { ...leave, status };
-    return leave;
-  });
-  localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
-  setTasks([...tasks]); // Trigger re-render
-};
+    const updateLeaveStatus = (leaveId, status) => {
+    const updatedLeaves = leaves.map(leave =>
+      leave.id === leaveId ? { ...leave, managerStatus: status } : leave
+    );
+    setLeaves(updatedLeaves);
+    localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
+  };
 
 
   return (
@@ -335,47 +336,44 @@ function ManagerDashboard() {
       )}
 
 {/* leave tab content */}
-{activeTab === 'leaves' && (
-  <div>
-    <h5 className="mb-3">Leave Requests</h5>
-    <div className="card">
-      <div className="card-body">
-        {/* Fetch leaves from localStorage */}
-        {(() => {
-          const allLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
-          // Only show leaves of manager's team
-          const teamLeaves = allLeaves.filter(leave => 
-            teamMembers.some(member => member.id === Number(leave.employeeId))
-          );
-          if (teamLeaves.length === 0) return <p>No leave requests.</p>;
-          return (
-            <ul className="list-group">
-              {teamLeaves.map((leave) => (
-                <li key={leave.id} className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <div className="fw-bold">{employees.find(e => e.id === leave.employeeId)?.name || 'Employee'}</div>
-                    <small>{leave.startDate} → {leave.endDate}</small>
-                    <div><small>Reason: {leave.reason}</small></div>
-                  </div>
-                  <div>
-                    {leave.status === 'pending' ? (
-                      <>
-                        <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'approved')}>Approve</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'rejected')}>Reject</button>
-                      </>
-                    ) : (
-                      <span className={`badge ${leave.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>{leave.status}</span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          );
-        })()}
-      </div>
-    </div>
-  </div>
-)}
+      {activeTab === 'leaves' && (
+        <div>
+          <h5 className="mb-3">Leave Requests</h5>
+          <div className="card">
+            <div className="card-body">
+              {(() => {
+                const teamLeaves = leaves.filter(leave =>
+                  teamMembers.some(member => member.id === Number(leave.employeeId))
+                );
+                if (teamLeaves.length === 0) return <p>No leave requests.</p>;
+                return (
+                  <ul className="list-group">
+                    {teamLeaves.map((leave) => (
+                      <li key={leave.id} className="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <div className="fw-bold">{employees.find(e => e.id === leave.employeeId)?.name || 'Employee'}</div>
+                          <small>{leave.startDate} → {leave.endDate}</small>
+                          <div><small>Reason: {leave.reason}</small></div>
+                        </div>
+                        <div>
+                          {!leave.managerStatus ? (
+                            <>
+                              <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'approved')}>Approve</button>
+                              <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'rejected')}>Reject</button>
+                            </>
+                          ) : (
+                            <span className={`badge ${leave.managerStatus === 'approved' ? 'bg-success' : 'bg-danger'}`}>{leave.managerStatus}</span>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
 
 

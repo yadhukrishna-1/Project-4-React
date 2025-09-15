@@ -49,6 +49,7 @@ const defaultDept = [
 function AdminDashboard({ user }) {
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [leaves, setLeaves] = useState([]);
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [showAddDepartment, setShowAddDepartment] = useState(false);
   const [newEmployee, setNewEmployee] = useState({ name: '', role: 'employee', department: '', email: '', username: '', password: '' });
@@ -98,6 +99,11 @@ function AdminDashboard({ user }) {
       const deptData = defaultDept;
       setDepartments(deptData);
       localStorage.setItem('departments', JSON.stringify(deptData));
+    }
+
+    const storedLeaves = localStorage.getItem('leaves');
+    if (storedLeaves) {
+      setLeaves(JSON.parse(storedLeaves));
     }
   }, []);
 
@@ -294,12 +300,10 @@ function AdminDashboard({ user }) {
 
   // Leave Requests Tab Content
   const updateLeaveStatus = (leaveId, field, status) => {
-  const leaves = JSON.parse(localStorage.getItem('leaves')) || [];
-  const updatedLeaves = leaves.map(lv => lv.id === leaveId ? { ...lv, [field]: status } : lv);
-  localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
-  // Force re-render
-  setEmployees([...employees]);
-};
+    const updatedLeaves = leaves.map(lv => lv.id === leaveId ? { ...lv, [field]: status } : lv);
+    setLeaves(updatedLeaves);
+    localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
+  };
 
   return (
     <div>
@@ -922,55 +926,46 @@ function AdminDashboard({ user }) {
 
 
       {/* Leave Requests Tab Content */}
-      <div
-  role="tabpanel"
-  id="leaveRequests-tab"
-  aria-labelledby="leaveRequests-tab-button"
-  hidden={activeTab !== 'leaveRequests'}
-  className="tab-panel"
->
-  <h5 className="mb-3">Employee Leave Requests</h5>
-  {(() => {
-    const leaves = JSON.parse(localStorage.getItem('leaves')) || [];
-    if (leaves.length === 0) return <p>No leave requests yet.</p>;
-
-    return (
-      <ul className="list-group">
-        {leaves.map((leave) => {
-          const employee = employees.find(e => e.id === leave.employeeId);
-          return (
-            <li key={leave.id} className="list-group-item d-flex justify-content-between align-items-center">
-              <div>
-                <div className="fw-bold">{employee?.name || 'Employee'}</div>
-                <small>{leave.startDate} → {leave.endDate}</small>
-                <div><small>Reason: {leave.reason}</small></div>
-                <div><small>Manager Status: {leave.managerStatus || 'Pending'}</small></div>
-                <div><small>Admin Status: {leave.adminStatus || 'Pending'}</small></div>
-              </div>
-              <div>
-                {/* Manager approval buttons */}
-                {leave.managerStatus !== 'approved' && leave.managerStatus !== 'rejected' && (
-                  <>
-                    <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'approved')}>Manager Approve</button>
-                    <button className="btn btn-danger btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'rejected')}>Manager Reject</button>
-                  </>
-                )}
-                {/* Admin approval buttons */}
-                {leave.managerStatus === 'approved' && !leave.adminStatus && (
-                  <>
-                    <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'approved')}>Admin Approve</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'rejected')}>Admin Reject</button>
-                  </>
-                )}
-                {leave.adminStatus && <span className={`badge ${leave.adminStatus === 'approved' ? 'bg-success' : 'bg-danger'}`}>{leave.adminStatus}</span>}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  })()}
-</div>
+      {activeTab === 'leaveRequests' && (
+        <div>
+          <h5>Leave Requests</h5>
+          {leaves.length === 0 ? <p>No leave requests yet.</p> : (
+            <ul className="list-group">
+              {leaves.map(leave => {
+                const employee = employees.find(e => e.id === leave.employeeId);
+                return (
+                  <li key={leave.id} className="list-group-item d-flex justify-content-between">
+                    <div>
+                      <strong>{employee?.name || 'Unknown'}</strong> ({leave.startDate} → {leave.endDate})  
+                      <div>Reason: {leave.reason}</div>
+                      <div>Manager: {leave.managerStatus || 'Pending'}, Admin: {leave.adminStatus || 'Pending'}</div>
+                    </div>
+                    <div>
+                      {!leave.managerStatus && (
+                        <>
+                          <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'approved')}>Manager Approve</button>
+                          <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'managerStatus', 'rejected')}>Reject</button>
+                        </>
+                      )}
+                      {leave.managerStatus === 'approved' && !leave.adminStatus && (
+                        <>
+                          <button className="btn btn-success btn-sm me-2" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'approved')}>Admin Approve</button>
+                          <button className="btn btn-danger btn-sm" onClick={() => updateLeaveStatus(leave.id, 'adminStatus', 'rejected')}>Reject</button>
+                        </>
+                      )}
+                      {leave.adminStatus && (
+                        <span className={`badge ${leave.adminStatus === 'approved' ? 'bg-success' : 'bg-danger'}`}>
+                          {leave.adminStatus}
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      )}
 
     </div>
   );
