@@ -168,18 +168,18 @@ function AdminDashboard({ user }) {
           </li>
 
           <li className="nav-item" role="presentation">
-  <button
-    className={`nav-link ${activeTab === 'leaveRequests' ? 'active' : ''}`}
-    id="leaveRequests-tab-button"
-    type="button"
-    role="tab"
-    aria-controls="leaveRequests-tab"
-    aria-selected={activeTab === 'leaveRequests'}
-    onClick={() => setActiveTab('leaveRequests')}
-  >
-    Leave Requests
-  </button>
-</li>
+            <button
+              className={`nav-link ${activeTab === 'leaveRequests' ? 'active' : ''}`}
+              id="leaveRequests-tab-button"
+              type="button"
+              role="tab"
+              aria-controls="leaveRequests-tab"
+              aria-selected={activeTab === 'leaveRequests'}
+              onClick={() => setActiveTab('leaveRequests')}
+            >
+              Leave Requests
+            </button>
+          </li>
 
           <li className="nav-item" role="presentation">
             <button
