@@ -10,7 +10,7 @@ const DEMO_USERS = [
   {
     id: 1,
     name: 'Abhinav S',
-    role: 'admin HR',
+    role: 'admin',
     isAdminHR: true,
     department: 'Administration',
     email: 'superadmin@hrmconnect.com',
@@ -60,7 +60,7 @@ function AdminDashboard({ user }) {
   // Audit log for employee additions and removals
   const [auditLog, setAuditLog] = useState([]);
 
-  useEffect(() => {
+  useEffect(() =>  {
     // localStorage.removeItem('employees');
     // localStorage.removeItem('departments');
     const storedEmployees = localStorage.getItem('employees');
@@ -211,6 +211,7 @@ function AdminDashboard({ user }) {
           )}
         </ul>
 
+        {/* Over-View Tab  */}
         <div
           role="tabpanel"
           id="overview-tab"
@@ -287,7 +288,7 @@ function AdminDashboard({ user }) {
                 <tbody>
                   {auditLog.map((log) => (
                     <tr key={log.id}>
-                      <td>{log.type === 'addition' ? 'Added' : 'Removed'}</td>
+                      <td>{log.type === 'addition' ? 'Added' : log.type === 'removal' ? 'Removed' : 'Edited'}</td>
                       <td>{log.employeeName}</td>
                       <td>{log.hrName}</td>
                       <td>{log.reason || '-'}</td>
@@ -300,9 +301,6 @@ function AdminDashboard({ user }) {
           </div>
         )}
       </div>
-
-
-
     </div>
   );
 }

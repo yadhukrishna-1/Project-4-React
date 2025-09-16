@@ -16,7 +16,9 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
     let isAdminHRFlag = false;
     if (newEmployee.role === 'admin') {
       roleToSet = 'admin';
-      isAdminHRFlag = false; // Normal HR
+      // Check if there is any Admin HR already
+      const hasAdminHR = employees.some(emp => emp.role === 'admin' && emp.isAdminHR === true);
+      isAdminHRFlag = !hasAdminHR; // Set true if no Admin HR exists
     } else {
       roleToSet = newEmployee.role;
       isAdminHRFlag = false;
@@ -43,14 +45,15 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
     setNewEmployee({ name: '', role: 'employee', department: '', email: '', username: '', password: '' });
     setShowAddEmployee(false);
   };
+  
+  // Edit modal: add isAdminHR checkbox visible only to Admin HR users
+  const handleEditEmployeeChange = (field, value) => {
+    setEditEmployee({ ...editEmployee, [field]: value });
+  };
 
   const openEditEmployee = (emp) => {
     setEditEmployee(emp);
     setShowEditEmployee(true);
-  };
-
-  const handleEditEmployeeChange = (field, value) => {
-    setEditEmployee({ ...editEmployee, [field]: value });
   };
 
   const saveEditEmployee = () => {
@@ -83,13 +86,28 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
     const updatedEmployees = employees.map(emp => emp.id === editEmployee.id ? editEmployee : emp);
     setEmployees(updatedEmployees);
     saveToLocalStorage('employees', updatedEmployees);
+
+    // Log edit in audit log
+    const newLogEntry = {
+      id: Date.now(),
+      type: 'edit',
+      employeeName: editEmployee.name,
+      hrName: user.name,
+      timestamp: new Date().toISOString(),
+      reason: 'Employee details updated'
+    };
+    const updatedAuditLog = [...auditLog, newLogEntry];
+    setAuditLog(updatedAuditLog);
+    saveToLocalStorage('auditLog', updatedAuditLog);
+
     setShowEditEmployee(false);
     setEditEmployee(null);
   };
 
+
+
   const confirmDeleteEmployee = (emp) => {
     setDeleteTarget(emp);
-    setDeleteType('employee');
     setDeleteError(''); // Reset error
     setShowDeleteConfirm(true);
   };
@@ -101,6 +119,16 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
       if (remainingAdmins.length === 0) {
         setDeleteError('At least one admin must remain to manage the website.');
         return; // Prevent deletion
+      }
+      // If deleting current Admin HR, assign isAdminHR to another admin
+      if (deleteTarget.isAdminHR) {
+        const newAdminHR = { ...remainingAdmins[0], isAdminHR: true };
+        const updatedEmployees = employees.map(emp => {
+          if (emp.id === newAdminHR.id) return newAdminHR;
+          return emp;
+        });
+        setEmployees(updatedEmployees);
+        saveToLocalStorage('employees', updatedEmployees);
       }
     }
 
@@ -155,7 +183,7 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
                     ? <span className="badge bg-success">{emp.name} (Admin HR)</span>
                     : emp.name}
                 </td>
-                <td>{emp.role === 'admin' ? 'Admin' : emp.role}</td>
+                <td>{emp.role === 'admin' ? (emp.isAdminHR ? 'Admin HR' : 'Admin') : emp.role}</td>
                 <td>{emp.department}</td>
                 <td>{emp.email}</td>
                 <td>{emp.username}</td>
@@ -248,10 +276,10 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
                     <input
                       type="text"
                       className="form-control"
-                      value="Normal HR (not Admin HR)"
+                      value={employees.some(emp => emp.role === 'admin' && emp.isAdminHR === true) ? "Normal HR (not Admin HR)" : "Admin HR (first admin)"}
                       disabled
                     />
-                    <small className="text-muted">Only the default admin is Admin HR. New admins are Normal HR.</small>
+                    <small className="text-muted">New admins will be Admin HR if no Admin HR exists, otherwise Normal HR.</small>
                   </div>
                 )}
               </div>
@@ -295,6 +323,22 @@ function Employees({ employees, departments, user, setEmployees, saveToLocalStor
                     <option value="admin">Admin</option>
                   </select>
                 </div>
+                {user.isAdminHR && editEmployee.role === 'admin' && (
+                  <div className="mb-3">
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="isAdminHR"
+                        checked={editEmployee.isAdminHR || false}
+                        onChange={(e) => handleEditEmployeeChange('isAdminHR', e.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor="isAdminHR">
+                        Admin HR
+                      </label>
+                    </div>
+                  </div>
+                )}
                 <div className="mb-3">
                   <label className="form-label">Department</label>
                   <select

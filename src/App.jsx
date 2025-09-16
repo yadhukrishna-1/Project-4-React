@@ -42,7 +42,7 @@ function App() {
 
               <div className="container mt-4">
                 <Routes>
-                  <Route path="/admin" element={user.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
+<Route path="/admin" element={user.role === 'admin' ? <AdminDashboard user={user} /> : <Navigate to="/" />} />
                   <Route path="/manager" element={user.role === 'manager' ? <ManagerDashboard /> : <Navigate to="/" />} />
                   <Route path="/employee" element={user.role === 'employee' ? <EmployeeDashboard /> : <Navigate to="/" />} />
 

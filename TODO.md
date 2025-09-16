@@ -1,7 +1,6 @@
-# TODO: Fix ManagerDashboard Issues
-
-- [ ] Add leaves state declaration
-- [ ] Fetch leaves in useEffect
-- [ ] Change saveTask status to 'active'
-- [ ] Update updateLeaveStatus to set 'managerStatus'
-- [ ] Adjust leave tab display for managerStatus
+- [x] Update DEMO_USERS in AdminDashboard.jsx: change role from 'admin HR' to 'admin'
+- [x] Update table display in Employees.jsx to show 'Admin HR' or 'Admin' based on isAdminHR flag
+- [x] Add isAdminHR checkbox in edit modal (visible only to Admin HR users)
+- [x] Update saveEditEmployee logic to handle isAdminHR changes and handover
+- [x] Update handleDelete to assign isAdminHR to another admin if deleting the current Admin HR
+- [x] Update addEmployee logic to set isAdminHR=true if no Admin HR exists
