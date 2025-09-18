@@ -105,8 +105,10 @@ function LeaveCalendar({ user }) {
                 </tr>
               );
             })}
+            
         </tbody>
       </table>
+      <button onClick={() => setLeaves([])} className="btn btn-danger">Clear All</button>
     </div>
   );
 }
