@@ -478,5 +478,4 @@ function ManagerDashboard() {
   );
 }
 
-// Make sure to export as default
 export default ManagerDashboard;
