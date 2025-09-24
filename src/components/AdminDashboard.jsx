@@ -61,35 +61,16 @@ function AdminDashboard({ user }) {
   const [auditLog, setAuditLog] = useState([]);
 
   useEffect(() =>  {
-    // localStorage.removeItem('employees');
-    // localStorage.removeItem('departments');
+    // Load data from localStorage (initialized by index.html and Login.jsx)
     const storedEmployees = localStorage.getItem('employees');
     const storedDepartments = localStorage.getItem('departments');
-    let empData = [];
 
     if (storedEmployees) {
-      empData = JSON.parse(storedEmployees);
-      // Ensure demo users are present
-      DEMO_USERS.forEach(demoUser => {
-        if (!empData.find(emp => emp.username === demoUser.username && emp.password === demoUser.password)) {
-          empData.push(demoUser);
-        }
-      });
-
-    } else {
-      empData = [...DEMO_USERS];
+      setEmployees(JSON.parse(storedEmployees));
     }
-    localStorage.setItem('employees', JSON.stringify(empData));
-    setEmployees(empData);
 
     if (storedDepartments) {
       setDepartments(JSON.parse(storedDepartments));
-    } else {
-      // Add default department
-
-      const deptData = defaultDept;
-      setDepartments(deptData);
-      localStorage.setItem('departments', JSON.stringify(deptData));
     }
 
     const storedLeaves = localStorage.getItem('leaves');

@@ -1,11 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import ManagerDashboard from './components/ManagerDashboard';
 import EmployeeDashboard from './components/EmployeeDashboard';
 import './App.css';
+
+// Demo users for initialization
+const DEMO_USERS = [
+  {
+    id: 1,
+    name: 'Abhinav S',
+    role: 'admin',
+    isAdminHR: true,
+    department: 'Administration',
+    email: 'superadmin@hrmconnect.com',
+    username: 'superadmin',
+    password: 'superadmin123'
+  },
+  {
+    id: 2,
+    name: 'Simi ES',
+    role: 'manager',
+    department: 'Production',
+    email: 'Simi@hrmconnect.com',
+    username: 'manager1',
+    password: 'manager123'
+  },
+  {
+    id: 3,
+    name: 'Ramees S',
+    role: 'employee',
+    department: 'Production',
+    email: 'Ramees@hrmconnect.com',
+    username: 'employee1',
+    password: 'emp123'
+  }
+];
+
+const DEFAULT_DEPARTMENTS = [
+  {
+    id: 1,
+    name: 'Administration',
+    description: 'Administrative department'
+  },
+  {
+    id: 2,
+    name: 'Production',
+    description: 'Production department'
+  }
+];
 
 function App() {
   const [user, setUser] = useState(null);
@@ -15,6 +60,8 @@ function App() {
     localStorage.removeItem('loggedInUser');
     setUser(null);
   };
+
+
 
   return (
     <Router>

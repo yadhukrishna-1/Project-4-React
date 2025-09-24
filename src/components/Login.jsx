@@ -1,29 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Demo users for fallback initialization
+const DEMO_USERS = [
+  {
+    id: 1,
+    name: 'Abhinav S',
+    role: 'admin',
+    isAdminHR: true,
+    department: 'Administration',
+    email: 'superadmin@hrmconnect.com',
+    username: 'superadmin',
+    password: 'superadmin123'
+  },
+  {
+    id: 2,
+    name: 'Simi ES',
+    role: 'manager',
+    department: 'Production',
+    email: 'Simi@hrmconnect.com',
+    username: 'manager1',
+    password: 'manager123'
+  },
+  {
+    id: 3,
+    name: 'Ramees S',
+    role: 'employee',
+    department: 'Production',
+    email: 'Ramees@hrmconnect.com',
+    username: 'employee1',
+    password: 'emp123'
+  }
+];
+
+const DEFAULT_DEPARTMENTS = [
+  {
+    id: 1,
+    name: 'Administration',
+    description: 'Administrative department'
+  },
+  {
+    id: 2,
+    name: 'Production',
+    description: 'Production department'
+  }
+];
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Initialize demo data if not present
+  useEffect(() => {
+    try {
+      const storedEmployees = localStorage.getItem('employees');
+      const storedDepartments = localStorage.getItem('departments');
+
+      if (!storedEmployees) {
+        console.log('Initializing demo employees data...');
+        localStorage.setItem('employees', JSON.stringify(DEMO_USERS));
+      }
+
+      if (!storedDepartments) {
+        console.log('Initializing demo departments data...');
+        localStorage.setItem('departments', JSON.stringify(DEFAULT_DEPARTMENTS));
+      }
+    } catch (error) {
+      console.error('Error initializing demo data:', error);
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     console.log('Login attempt:', { username, password });
 
-    const employees = JSON.parse(localStorage.getItem('employees') || '[]');
-    const user = employees.find(
-      (emp) => emp.username === username && emp.password === password
-    );
+    try {
+      const employeesData = localStorage.getItem('employees');
+      if (!employeesData) {
+        console.log('No employees data found in localStorage');
+        alert('Demo data not initialized. Please refresh the page and try again.');
+        return;
+      }
 
-    if (user) {
-      console.log('Login successful for user:', user);
-      // Store logged-in user in localStorage for dashboard access
-      localStorage.setItem('loggedInUser', JSON.stringify(user)); 
-      onLogin(user);
-    } else {
-      console.log('Login failed: Invalid username or password');
-      alert('Invalid credentials. Please check your username and password.');
+      const employees = JSON.parse(employeesData);
+      const user = employees.find(
+        (emp) => emp.username === username && emp.password === password
+      );
+
+      if (user) {
+        console.log('Login successful for user:', user);
+        // Store logged-in user in localStorage for dashboard access
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+        onLogin(user);
+      } else {
+        console.log('Login failed: Invalid username or password');
+        alert('Invalid credentials. Please check your username and password.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('An error occurred during login. Please refresh the page and try again.');
     }
   };
 
