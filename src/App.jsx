@@ -7,6 +7,7 @@ import ManagerDashboard from './components/ManagerDashboard';
 import EmployeeDashboard from './components/EmployeeDashboard';
 import './App.css';
 
+
 // Demo users for initialization
 const DEMO_USERS = [
   {
