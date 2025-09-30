@@ -2,7 +2,7 @@ import React from 'react';
 
 function LeaveList({ leaves, employees, teamMembers, updateLeaveStatus }) {
   const teamLeaves = leaves.filter(leave =>
-    teamMembers.some(member => member.id === Number(leave.employeeId))
+    teamMembers.some(member => member.id === Number(leave.employeeId)) && !leave.cancelled
   );
 
   if (teamLeaves.length === 0) return <p>No leave requests.</p>;

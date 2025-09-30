@@ -242,6 +242,18 @@ function AdminDashboard({ user }) {
           className="tab-panel"
         >
           <LeaveRequests leaves={leaves} employees={employees} updateLeaveStatus={updateLeaveStatus} />
+          <button
+            onClick={() => {
+              if (window.confirm('Are you sure you want to clear all leave history? This action cannot be undone.')) {
+                localStorage.setItem('leaves', JSON.stringify([]));
+                setLeaves([]);
+                alert('All leave history cleared!');
+              }
+            }}
+            className="btn btn-danger mt-3"
+          >
+            Clear Leave History
+          </button>
         </div>
 
         {isAdminHR && (

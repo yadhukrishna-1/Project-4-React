@@ -69,6 +69,16 @@ function ManagerDashboard() {
     alert('All tasks cleared!');
   };
 
+  const clearLeaves = () => {
+    if (window.confirm('Are you sure you want to clear leave history for your team? This action cannot be undone.')) {
+      const allLeaves = JSON.parse(localStorage.getItem('leaves')) || [];
+      const updatedLeaves = allLeaves.filter(leave => !teamMembers.some(member => member.id === leave.employeeId));
+      localStorage.setItem('leaves', JSON.stringify(updatedLeaves));
+      setLeaves(updatedLeaves);
+      alert('Leave history cleared for your team!');
+    }
+  };
+
   // Handle new task input change
   const handleTaskChange = (field, value) => {
     setNewTask({ ...newTask, [field]: value });
@@ -171,12 +181,20 @@ function ManagerDashboard() {
       )}
 
       {activeTab === 'leaves' && (
-        <LeaveRequests
-          leaves={leaves}
-          employees={employees}
-          teamMembers={teamMembers}
-          updateLeaveStatus={updateLeaveStatus}
-        />
+        <div>
+          <LeaveRequests
+            leaves={leaves}
+            employees={employees}
+            teamMembers={teamMembers}
+            updateLeaveStatus={updateLeaveStatus}
+          />
+          <button
+            onClick={clearLeaves}
+            className="btn btn-danger mt-3"
+          >
+            Clear Leave History
+          </button>
+        </div>
       )}
 
       <TaskModal

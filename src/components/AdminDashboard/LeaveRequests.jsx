@@ -4,9 +4,9 @@ function LeaveRequests({ leaves, employees, updateLeaveStatus }) {
   return (
     <div>
       <h5>Leave Requests</h5>
-      {leaves.length === 0 ? <p>No leave requests yet.</p> : (
+      {leaves.filter(leave => !leave.cancelled).length === 0 ? <p>No leave requests yet.</p> : (
         <ul className="list-group">
-          {leaves.map(leave => {
+          {leaves.filter(leave => !leave.cancelled).map(leave => {
             const employee = employees.find(e => e.id === leave.employeeId);
             return (
               <li key={leave.id} className="list-group-item d-flex justify-content-between">

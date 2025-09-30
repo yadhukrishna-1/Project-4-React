@@ -18,6 +18,14 @@ function LeaveCalendar({ user }) {
     localStorage.setItem("leaves", JSON.stringify(updated));
   };
 
+  const cancelLeave = (leaveId) => {
+    const updated = leaves.map(leave =>
+      leave.id === leaveId ? { ...leave, cancelled: true } : leave
+    );
+    saveLeaves(updated);
+    alert("Leave request cancelled!");
+  };
+
   const submitLeaveRequest = () => {
     if (!newLeave.startDate || !newLeave.endDate || !newLeave.reason) {
       alert("Please fill all fields.");
@@ -34,6 +42,7 @@ function LeaveCalendar({ user }) {
       reason: newLeave.reason,
       managerStatus: null,
       adminStatus: null,
+      cancelled: false,
     };
 
     const updated = [...leaves, newRequest];
@@ -81,6 +90,7 @@ function LeaveCalendar({ user }) {
             <th>Dates</th>
             <th>Reason</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -88,7 +98,9 @@ function LeaveCalendar({ user }) {
             .filter((leave) => leave.employeeId === user.id)
             .map((leave) => {
               let status = 'Pending';
-              if (leave.adminStatus === 'approved') {
+              if (leave.cancelled) {
+                status = 'Cancelled';
+              } else if (leave.adminStatus === 'approved') {
                 status = 'Approved';
               } else if (leave.adminStatus === 'rejected') {
                 status = 'Rejected';
@@ -102,13 +114,36 @@ function LeaveCalendar({ user }) {
                   <td>{leave.startDate} to {leave.endDate}</td>
                   <td>{leave.reason}</td>
                   <td>{status}</td>
+                  <td>
+                    {!leave.cancelled && leave.adminStatus === null && (
+                      <button
+                        onClick={() => cancelLeave(leave.id)}
+                        className="btn btn-warning btn-sm"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </td>
                 </tr>
               );
             })}
             
         </tbody>
       </table>
-      <button onClick={() => setLeaves([])} className="btn btn-danger">Clear All</button>
+      <button
+        onClick={() => {
+          if (window.confirm('Are you sure you want to clear your leave history? This action cannot be undone.')) {
+            const allLeaves = JSON.parse(localStorage.getItem("leaves")) || [];
+            const updatedLeaves = allLeaves.filter(leave => leave.employeeId !== user.id);
+            localStorage.setItem("leaves", JSON.stringify(updatedLeaves));
+            setLeaves(updatedLeaves);
+            alert("Leave history cleared!");
+          }
+        }}
+        className="btn btn-danger"
+      >
+        Clear Leave History
+      </button>
     </div>
   );
 }
