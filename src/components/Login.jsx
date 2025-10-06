@@ -51,6 +51,7 @@ function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  
   // Initialize demo data if not present
   useEffect(() => {
     try {
